@@ -1,39 +1,27 @@
-(function(Formio) {
-    const checkFormio = setInterval(() => {
-        if (window.Formio) {
-            clearInterval(checkFormio);
-            registerComponent(window.Formio);
-        }
-    }, 100);
+(function() {
+  const TextFieldComponent = Formio.Components.components.textfield;
 
-    function registerComponent(Formio) {
-        const DateTimeComponent = Formio.Components.components.datetime;
-
-        class JalaliComponent extends DateTimeComponent {
-            static schema(...extend) {
-                return DateTimeComponent.schema({
-                    type: 'jalali',
-                    label: 'Jalali Date',
-                    key: 'jalaliDate'
-                }, ...extend);
-            }
-
-            static get builderInfo() {
-                return {
-                    title: 'Jalali Calendar',
-                    group: 'advanced',
-                    icon: 'calendar',
-                    weight: 10,
-                    schema: JalaliComponent.schema()
-                };
-            }
-        }
-
-        Formio.use({
-            components: {
-                jalali: JalaliComponent
-            }
-        });
-        console.log("Jalali Component Registered Successfully!");
+  class MyCustomComponent extends TextFieldComponent {
+    static schema(...extend) {
+      return TextFieldComponent.schema({
+        type: 'mycustom',
+        label: 'My Custom Field',
+        key: 'mycustom'
+      }, ...extend);
     }
-})(window.Formio);
+
+    static get builderInfo() {
+      return {
+        title: 'My Custom Component',
+        group: 'basic',
+        icon: 'star',
+        weight: 100,
+        schema: MyCustomComponent.schema()
+      };
+    }
+  }
+
+  Formio.Components.addComponent('mycustom', MyCustomComponent);
+  
+  console.log('Custom component registered!');
+})();
