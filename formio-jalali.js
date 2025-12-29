@@ -1,27 +1,58 @@
+// We use the global Formio object provided by the portal/renderer
 (function() {
-  const TextFieldComponent = Formio.Components.components.textfield;
+  const Field = Formio.Components.components.field;
 
-  class MyCustomComponent extends TextFieldComponent {
+  class JalaliComponent extends Field {
     static schema(...extend) {
-      return TextFieldComponent.schema({
-        type: 'mycustom',
-        label: 'My Custom Field',
-        key: 'mycustom'
+      return Field.schema({
+        type: 'jalali',
+        label: 'Jalali Date',
+        key: 'jalaliDate',
       }, ...extend);
     }
 
     static get builderInfo() {
       return {
-        title: 'My Custom Component',
-        group: 'basic',
-        icon: 'star',
-        weight: 100,
-        schema: MyCustomComponent.schema()
+        title: 'Jalali Calendar',
+        group: 'advanced',
+        icon: 'calendar',
+        weight: 0,
+        schema: JalaliComponent.schema()
       };
+    }
+
+    // Define the HTML of your component
+    render() {
+      return super.render(`
+        <div class="input-group">
+          <input ref="jalaliInput" class="form-control" placeholder="YYYY/MM/DD">
+        </div>
+      `);
+    }
+
+    // This runs when the component appears on the screen
+    attach(element) {
+      this.loadRefs(element, { jalaliInput: 'single' });
+
+      // Note: This assumes you have loaded a Jalali library 
+      // (like persian-datepicker) in your project's Custom CSS/JS section too.
+      if (this.refs.jalaliInput && window.jQuery && jQuery.fn.persianDatepicker) {
+        jQuery(this.refs.jalaliInput).persianDatepicker({
+          format: 'YYYY/MM/DD',
+          autoClose: true,
+          onSelect: (unix) => {
+            this.updateValue(unix); 
+          }
+        });
+      }
+      return super.attach(element);
     }
   }
 
-  Formio.Components.addComponent('mycustom', MyCustomComponent);
-  
-  console.log('Custom component registered!');
+  // Register the component so it shows up in your Builder
+  Formio.use({
+    components: {
+      jalali: JalaliComponent
+    }
+  });
 })();
